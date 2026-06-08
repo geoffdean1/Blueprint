@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Blueprint</title>
+<style>
+:root {
+  --green:#3B6D11;--green-bg:#EAF3DE;--green-mid:#639922;--green-light:#C0DD97;
+  --amber:#854F0B;--amber-bg:#FAEEDA;--amber-mid:#BA7517;--amber-light:#FAC775;
+  --red:#A32D2D;--red-bg:#FCEBEB;--red-mid:#E24B4A;--red-light:#F7C1C1;
+  --teal:#0F6E56;--teal-bg:#E1F5EE;--teal-mid:#1D9E75;--teal-light:#9FE1CB;
+  --blue:#185FA5;--blue-bg:#E6F1FB;--blue-mid:#378ADD;
+  --gray-bg:#F1EFE8;--gray-border:#D3D1C7;
+  --text:#2C2C2A;--text-muted:#888780;--white:#fff;
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:var(--text);min-height:100vh;overflow-x:hidden;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+
+/* ONBOARDING */
+.ob-wrap{max-width:480px;margin:0 auto;padding:24px 20px 100px;}
+.ob-progress{display:flex;gap:6px;margin-bottom:32px;}
+.ob-step{flex:1;height:3px;background:var(--gray-border);border-radius:2px;transition:background .3s;}
+.ob-step.done{background:var(--teal-mid);}
+.ob-step.active{background:var(--teal);}
+.ob-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.ob-title{font-size:26px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:8px;}
+.ob-sub{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:28px;}
+.ob-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.ob-input{width:100%;background:var(--white);border:1.5px solid var(--gray-border);border-radius:var(--rs);padding:13px 14px;font-size:16px;color:var(--text);outline:none;transition:border-color .15s;margin-bottom:16px;}
+.ob-input:focus{border-color:var(--teal-mid);}
+.ob-input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.opt-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.opt{background:var(--white);border:1.5px solid var(--gray-border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .12s;}
+.opt:hover{border-color:var(--teal-mid);}
+.opt.sel{background:var(--teal-bg);border-color:var(--teal-mid);}
+.opt-title{font-size:15px;font-weight:600;color:var(--text);}
+.opt-desc{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.opt.sel .opt-title{color:var(--teal);}
+.opt.sel .opt-desc{color:var(--teal);opacity:.8;}
+.ob-btn{width:100%;padding:15px;background:var(--teal);color:var(--white);border:none;border-radius:var(--rs);font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .12s;}
+.ob-btn:hover{background:var(--teal-mid);}
+.ob-btn:disabled{background:var(--gray-border);color:var(--text-muted);cursor:not-allowed;}
+.ob-back{background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;padding:0 0 20px;display:flex;align-items:center;gap:4px;}
+
+/* APP */
+.app-wrap{max-width:480px;margin:0 auto;padding:20px 20px 90px;}
+.app-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.app-name{font-size:24px;font-weight:700;color:var(--text);}
+.app-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--teal-bg);}
+
+/* WEEK BANNER */
+.week-banner{border-radius:var(--r);padding:16px 18px;margin-bottom:16px;border:1px solid;}
+.week-banner.b-full{background:var(--teal-bg);border-color:var(--teal-light);}
+.week-banner.b-chaos{background:var(--amber-bg);border-color:var(--amber-light);}
+.week-banner.b-gym{background:var(--blue-bg);border-color:#B5D4F4;}
+.banner-mode{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+.b-full .banner-mode{color:var(--teal);}
+.b-chaos .banner-mode{color:var(--amber);}
+.b-gym .banner-mode{color:var(--blue);}
+.banner-title{font-size:17px;font-weight:700;margin-top:3px;color:var(--text);}
+.banner-desc{font-size:13px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--rs);padding:14px;text-align:center;}
+.stat-val{font-size:26px;font-weight:700;color:var(--teal);}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+
+/* EXERCISES */
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+.ex-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ex-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .12s;cursor:pointer;}
+.ex-card.done{background:var(--green-bg);border-color:var(--green-light);}
+.ex-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .12s;}
+.ex-card.done .ex-check{background:var(--green-mid);border-color:var(--green-mid);}
+.check-mark{width:6px;height:10px;border-right:2.5px solid var(--white);border-bottom:2.5px solid var(--white);transform:rotate(45deg) translate(-1px,-1px);display:none;}
+.ex-card.done .check-mark{display:block;}
+.ex-name{font-size:15px;font-weight:700;color:var(--text);}
+.ex-card.done .ex-name{color:var(--green);text-decoration:line-through;text-decoration-color:var(--green-mid);}
+.ex-detail{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.ex-cue{font-size:12px;color:var(--teal);margin-top:5px;font-style:italic;}
+.ex-tag{display:inline-block;background:var(--gray-bg);padding:2px 8px;border-radius:10px;font-size:11px;color:var(--text-muted);margin-top:6px;}
+.ex-card.done .ex-tag{background:var(--green-bg);color:var(--green);}
+
+/* NUTRITION — SITUATION CARDS */
+.nut-targets{display:flex;gap:16px;background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;align-items:center;}
+.nut-target-item{text-align:center;}
+.nut-target-val{font-size:24px;font-weight:700;color:var(--teal);}
+.nut-target-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.nut-divider{width:1px;background:var(--gray-border);height:40px;}
+
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.toggle-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+.toggle-btn{background:var(--gray-bg);border:1px solid var(--gray-border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .12s;}
+.toggle-btn.expanded{background:var(--teal-bg);border-color:var(--teal-light);color:var(--teal);}
+
+.sit-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.sit-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);overflow:hidden;transition:border-color .12s;}
+.sit-card.hidden{display:none;}
+.sit-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;}
+.sit-emoji{font-size:22px;flex-shrink:0;}
+.sit-name{font-size:15px;font-weight:700;color:var(--text);flex:1;}
+.sit-context{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:10px;}
+.sit-context.travel{background:var(--blue-bg);color:var(--blue);}
+.sit-context.home{background:var(--green-bg);color:var(--green);}
+.sit-arrow{font-size:14px;color:var(--text-muted);transition:transform .2s;}
+.sit-card.open .sit-arrow{transform:rotate(90deg);}
+.sit-body{display:none;padding:0 16px 16px;border-top:1px solid var(--gray-bg);}
+.sit-card.open .sit-body{display:block;}
+.sit-section{margin-top:12px;}
+.sit-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.sit-section-label.go{color:var(--green);}
+.sit-section-label.skip{color:var(--red);}
+.sit-section-label.tip{color:var(--teal);}
+.sit-items{font-size:13px;color:var(--text-muted);line-height:1.7;}
+.sit-tip{background:var(--teal-bg);border-radius:var(--rs);padding:10px 12px;font-size:13px;color:var(--teal);line-height:1.6;margin-top:10px;}
+
+/* THIS OR THAT */
+.swaps-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.swap-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:14px 16px;}
+.swap-situation{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:10px;}
+.swap-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;}
+.swap-bad{background:var(--red-bg);border-radius:var(--rs);padding:10px 12px;text-align:center;}
+.swap-good{background:var(--green-bg);border-radius:var(--rs);padding:10px 12px;text-align:center;}
+.swap-bad-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-bottom:4px;}
+.swap-good-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:4px;}
+.swap-item{font-size:13px;font-weight:600;color:var(--text);}
+.swap-arrow{font-size:18px;color:var(--text-muted);text-align:center;}
+.swap-why{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.5;font-style:italic;}
+
+/* TRAFFIC LIGHT */
+.tl-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.tl{border-radius:var(--rs);padding:13px 15px;border:1px solid;}
+.tl.g{background:var(--green-bg);border-color:var(--green-light);}
+.tl.a{background:var(--amber-bg);border-color:var(--amber-light);}
+.tl.r{background:var(--red-bg);border-color:var(--red-light);}
+.tl-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.tl.g .tl-head{color:var(--green);}
+.tl.a .tl-head{color:var(--amber);}
+.tl.r .tl-head{color:var(--red);}
+.tl-body{font-size:13px;color:var(--text-muted);margin-top:5px;line-height:1.6;}
+
+/* PROGRESS */
+.weight-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.wt-input-row{display:flex;gap:10px;align-items:center;margin-top:12px;}
+.wt-input-row input{flex:1;border:1.5px solid var(--gray-border);border-radius:var(--rs);padding:11px 13px;font-size:16px;color:var(--text);background:var(--gray-bg);outline:none;}
+.wt-input-row input:focus{border-color:var(--teal-mid);}
+.log-btn{padding:11px 18px;background:var(--teal);color:var(--white);border:none;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;}
+.wt-entry{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray-bg);font-size:14px;}
+.wt-entry:last-child{border-bottom:none;}
+.wt-delta{font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;}
+.wt-delta.dn{background:var(--green-bg);color:var(--green);}
+.wt-delta.up{background:var(--red-bg);color:var(--red);}
+.wt-delta.eq{background:var(--gray-bg);color:var(--text-muted);}
+.progress-bar-wrap{background:var(--gray-bg);border-radius:10px;height:10px;margin:12px 0 6px;overflow:hidden;}
+.progress-bar{height:100%;background:var(--teal-mid);border-radius:10px;transition:width .4s;}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.4;}
+.empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.empty-desc{font-size:13px;line-height:1.6;}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray-border);display:flex;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:50;}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;border-radius:var(--rs);}
+.bnav-icon{font-size:22px;color:var(--text-muted);}
+.bnav-label{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{color:var(--teal);}
+
+/* MODAL */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+.modal-wrap.hidden{display:none;}
+.modal{background:#f0ede8;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));max-width:480px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-handle{width:40px;height:4px;background:var(--gray-border);border-radius:2px;margin:0 auto 20px;}
+
+/* MISC */
+.divider{height:1px;background:var(--gray-border);margin:18px 0;}
+.btn-ghost{background:none;border:1px solid var(--gray-border);color:var(--text-muted);border-radius:var(--rs);padding:10px 16px;font-size:13px;cursor:pointer;width:100%;margin-top:8px;}
+.btn-ghost:hover{border-color:var(--text-muted);color:var(--text);}
+.card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:18px;}
+.card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.card-sub{font-size:13px;color:var(--text-muted);margin-bottom:14px;}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--teal);color:var(--white);padding:10px 22px;border-radius:20px;font-size:14px;font-weight:600;transition:transform .3s;z-index:200;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.success-box{text-align:center;padding:22px;background:var(--green-bg);border-radius:var(--r);border:1px solid var(--green-light);margin-bottom:16px;}
+.plate-row{display:flex;gap:10px;margin-top:8px;}
+.plate-seg{flex:1;border-radius:var(--rs);padding:14px 10px;text-align:center;}
+.plate-seg.veg{background:var(--green-bg);}
+.plate-seg.pro{background:var(--teal-bg);}
+.plate-seg.carb{background:var(--amber-bg);}
+.plate-frac{font-size:24px;font-weight:700;}
+.plate-seg.veg .plate-frac{color:var(--green);}
+.plate-seg.pro .plate-frac{color:var(--teal);}
+.plate-seg.carb .plate-frac{color:var(--amber);}
+.plate-name{font-size:11px;font-weight:600;margin-top:3px;}
+.plate-seg.veg .plate-name{color:var(--green);}
+.plate-seg.pro .plate-name{color:var(--teal);}
+.plate-seg.carb .plate-name{color:var(--amber);}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="modal-wrap hidden" id="week-modal"></div>
+<div class="screen active" id="screen-ob"><div class="ob-wrap" id="ob-content"></div></div>
+<div class="screen" id="screen-app">
+  <div class="app-wrap" id="app-content"></div>
+  <div class="bnav">
+    <div class="bnav-item active" id="nav-today" onclick="showTab('today')"><div class="bnav-icon">📋</div><div class="bnav-label">Today</div></div>
+    <div class="bnav-item" id="nav-nutrition" onclick="showTab('nutrition')"><div class="bnav-icon">🥗</div><div class="bnav-label">Nutrition</div></div>
+    <div class="bnav-item" id="nav-progress" onclick="showTab('progress')"><div class="bnav-icon">📈</div><div class="bnav-label">Progress</div></div>
+    <div class="bnav-item" id="nav-settings" onclick="showTab('settings')"><div class="bnav-icon">⚙️</div><div class="bnav-label">Settings</div></div>
+  </div>
+</div>
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let S={}, currentTab='today', nutExpanded=false;
+function loadS(){try{S=JSON.parse(localStorage.getItem('bp_v3')||'{}');}catch(e){S={};}}
+function saveS(){localStorage.setItem('bp_v3',JSON.stringify(S));}
+function todayKey(){return new Date().toISOString().split('T')[0];}
+function weekStart(){const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);return new Date(new Date().setDate(diff)).toISOString().split('T')[0];}
+function fmtDate(ds){return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ── ONBOARDING ────────────────────────────────────────────────────────────────
+const OB_STEPS=[
+  {id:'welcome',type:'info',eyebrow:'Welcome',title:'Your personal health blueprint',sub:'This tool adapts to your life — your schedule, your environment, your goals. Setup takes about 2 minutes and you only do it once.',btnLabel:'Get started →'},
+  {id:'name',type:'text',eyebrow:'Step 1 of 7 — About you',title:'What\'s your name?',sub:'This personalizes everything in the app.',fields:[{key:'name',label:'Your first name',placeholder:'e.g. Alex',type:'text'}],btnLabel:'Continue →'},
+  {id:'weights',type:'text',eyebrow:'Step 2 of 7 — Your numbers',title:'Where are you starting?',sub:'Current and goal weight help calculate your targets and track real progress.',fields:[{key:'currentWeight',label:'Current weight (lbs)',placeholder:'e.g. 210',type:'number'},{key:'goalWeight',label:'Goal weight (lbs)',placeholder:'e.g. 160',type:'number'}],btnLabel:'Continue →'},
+  {id:'goal',type:'choice',eyebrow:'Step 3 of 7 — Your goal',title:'What\'s your primary goal?',sub:'This sets your nutrition tone and intensity defaults.',key:'goal',options:[{val:'lose',title:'Lose weight',desc:'I want to reduce body fat — I have weight to lose'},{val:'maintain',title:'Maintain & improve',desc:'I\'m near my goal — I want to maintain and get stronger'},{val:'build',title:'Build muscle',desc:'I want to gain strength and muscle mass'}]},
+  {id:'environment',type:'choice',eyebrow:'Step 4 of 7 — Your environment',title:'Where do you usually work out?',sub:'Your default workout type will be built around this. You can change it each week.',key:'defaultEnv',options:[{val:'bodyweight',title:'Bodyweight only',desc:'Hotel rooms, small spaces, no equipment'},{val:'gym',title:'Gym access',desc:'I have access to weights and machines'},{val:'home',title:'Home setup',desc:'Some equipment — resistance bands, dumbbells, or a pull-up bar'}]},
+  {id:'schedule',type:'choice',eyebrow:'Step 5 of 7 — Your schedule',title:'How predictable is your week?',sub:'This sets your default workout format.',key:'defaultSchedule',options:[{val:'consistent',title:'Fairly consistent',desc:'I can usually find 20–30 minutes most days'},{val:'variable',title:'Hit or miss',desc:'Some days are open, some are packed'},{val:'chaos',title:'High chaos',desc:'My schedule is unpredictable — I need something flexible'}]},
+  {id:'intensity',type:'choice',eyebrow:'Step 6 of 7 — Your intensity',title:'How hard do you want to push?',sub:'Be honest — sustainable beats heroic every time.',key:'defaultIntensity',options:[{val:'aggressive',title:'Aggressive',desc:'I want to push hard — maximize results'},{val:'moderate',title:'Moderate',desc:'Steady and sustainable — I\'m in this for the long run'},{val:'gentle',title:'Gentle',desc:'Low pressure — I\'m rebuilding habits or managing stress'}]},
+  {id:'lifestyle',type:'choice',eyebrow:'Step 7 of 7 — Your lifestyle',title:'What best describes your eating environment?',sub:'This shapes which nutrition situations appear first for you.',key:'lifestyle',options:[{val:'travel',title:'Frequent traveler',desc:'Airports, hotels, client dinners — eating out is the norm'},{val:'home',title:'Mostly home-based',desc:'I cook most meals or eat at home'},{val:'mixed',title:'Mixed',desc:'A bit of both depending on the week'}]}
+];
+let obStep=0,obData={};
+
+function renderOB(){
+  const step=OB_STEPS[obStep],total=OB_STEPS.length,wrap=document.getElementById('ob-content');
+  let prog='';
+  for(let i=0;i<total;i++) prog+=`<div class="ob-step ${i<obStep?'done':i===obStep?'active':''}"></div>`;
+  let body='';
+  if(step.type==='info'){
+    body=`<button class="ob-btn" onclick="obNext()">${step.btnLabel}</button>`;
+  } else if(step.type==='text'){
+    const isDouble=step.fields.length===2;
+    const inputs=step.fields.map(f=>`<div><div class="ob-label">${f.label}</div><input class="ob-input" id="ob-${f.key}" type="${f.type}" placeholder="${f.placeholder}" oninput="obCheckInputs()" /></div>`).join('');
+    body=`<div class="${isDouble?'ob-input-row':''}">${inputs}</div><button class="ob-btn" id="ob-next-btn" onclick="obNext()" disabled>Continue →</button>`;
+  } else if(step.type==='choice'){
+    const opts=step.options.map((o,i)=>`<div class="opt ${obData[step.key]===o.val?'sel':''}" id="opt-${i}" onclick="obSelect('${step.key}','${o.val}',${i})"><div class="opt-title">${o.title}</div><div class="opt-desc">${o.desc}</div></div>`).join('');
+    body=`<div class="opt-grid">${opts}</div><button class="ob-btn" id="ob-next-btn" onclick="obNext()" ${obData[step.key]?'':'disabled'}>${obStep===total-1?'Build my blueprint →':'Continue →'}</button>`;
+  }
+  wrap.innerHTML=`<div class="ob-progress">${prog}</div>${obStep>0?`<button class="ob-back" onclick="obBack()">← Back</button>`:''}<div class="ob-eyebrow">${step.eyebrow}</div><div class="ob-title">${step.title}</div><div class="ob-sub">${step.sub}</div>${body}`;
+}
+
+function obCheckInputs(){
+  const step=OB_STEPS[obStep];
+  const ok=step.fields.every(f=>{const el=document.getElementById('ob-'+f.key);return el&&el.value.trim()!=='';});
+  document.getElementById('ob-next-btn').disabled=!ok;
+}
+function obSelect(key,val,idx){
+  obData[key]=val;
+  document.querySelectorAll('.opt').forEach((el,i)=>el.classList.toggle('sel',i===idx));
+  const btn=document.getElementById('ob-next-btn');
+  if(btn) btn.disabled=false;
+}
+function obNext(){
+  const step=OB_STEPS[obStep];
+  if(step.type==='text') step.fields.forEach(f=>{const el=document.getElementById('ob-'+f.key);if(el) obData[f.key]=el.value.trim();});
+  if(obStep===OB_STEPS.length-1){finishOnboarding();return;}
+  obStep++;renderOB();window.scrollTo(0,0);
+}
+function obBack(){if(obStep>0){obStep--;renderOB();window.scrollTo(0,0);}}
+function finishOnboarding(){
+  S.profile={name:obData.name,currentWeight:parseFloat(obData.currentWeight),goalWeight:parseFloat(obData.goalWeight),goal:obData.goal,defaultEnv:obData.defaultEnv,defaultSchedule:obData.defaultSchedule,defaultIntensity:obData.defaultIntensity,lifestyle:obData.lifestyle,setupDate:todayKey()};
+  S.weekSetup=null;S.checkboxes={};S.weights=[];
+  saveS();toast('Welcome, '+S.profile.name+'! 🎉');launchApp();
+}
+
+// ── WORKOUT LIBRARY ───────────────────────────────────────────────────────────
+const WORKOUTS={
+  bodyweight:{
+    full:{
+      aggressive:[
+        {name:'Tempo Push-Ups',detail:'4×15 — 3s down, 1s hold, 1s up',cue:'Elbows at 45°, chest to floor every rep',tag:'Push'},
+        {name:'Bulgarian Split Squat',detail:'4×12 each leg — back foot elevated',cue:'Drive front knee forward, keep torso upright',tag:'Legs'},
+        {name:'Inverted Row',detail:'4×12 — under desk or table edge',cue:'Pull chest to surface, squeeze shoulder blades hard',tag:'Pull'},
+        {name:'Single-Leg Glute Bridge',detail:'3×15 each — 2s squeeze at top',cue:'Drive through heel, don\'t let hips rotate',tag:'Hinge'},
+        {name:'Plank to Push-Up',detail:'3×10 — plank → one arm up at a time',cue:'Hips stay level — don\'t rock side to side',tag:'Core'}
+      ],
+      moderate:[
+        {name:'Push-Ups',detail:'3×12 — controlled pace',cue:'Straight line from head to heel, chest touches floor',tag:'Push'},
+        {name:'Reverse Lunge',detail:'3×12 each leg',cue:'Back knee floats 1" above floor, chest stays tall',tag:'Legs'},
+        {name:'Inverted Row',detail:'3×10 — under desk or table',cue:'Lead with chest, not chin',tag:'Pull'},
+        {name:'Glute Bridge',detail:'3×20 — squeeze and hold 1s',cue:'Drive through heels, not toes',tag:'Hinge'},
+        {name:'Plank Hold',detail:'3×40s',cue:'Squeeze glutes as hard as possible',tag:'Core'}
+      ],
+      gentle:[
+        {name:'Wall Push-Ups',detail:'3×12 — incline reduces load',cue:'Body in a straight line, controlled movement',tag:'Push'},
+        {name:'Air Squats',detail:'3×15 — sit back into it',cue:'Weight in heels, knees track over toes',tag:'Legs'},
+        {name:'Superman Hold',detail:'3×10s each — back extension on floor',cue:'Squeeze glutes and lower back at top',tag:'Back'},
+        {name:'Dead Bug',detail:'3×10 each side',cue:'Lower back pinned to floor the entire time',tag:'Core'},
+        {name:'Hip Flexor Stretch',detail:'3×30s each side — kneeling lunge',cue:'Tuck pelvis slightly, feel the front of the hip',tag:'Mobility'}
+      ]
+    },
+    chaos:{
+      aggressive:[
+        {name:'Max Push-Ups',detail:'5 sets throughout day — max reps each',cue:'Every rep counts toward your 100-rep daily goal',tag:'Micro'},
+        {name:'Jump Squats',detail:'4×15 — any 90-second window',cue:'Land soft, heel to toe, absorb with knees',tag:'Micro'},
+        {name:'Calf Raises',detail:'3×30 — elevators, lines, anywhere',cue:'Full range — all the way up and all the way down',tag:'Micro'},
+        {name:'Isometric Wall Sit',detail:'3×45s — find any wall',cue:'Thighs parallel, back flat, breathe normally',tag:'Micro'}
+      ],
+      moderate:[
+        {name:'Push-Ups (broken sets)',detail:'Target 50 total throughout the day',cue:'10 here, 10 there — it adds up',tag:'Micro'},
+        {name:'Air Squats',detail:'Target 60 total throughout the day',cue:'Every bathroom break = 15 squats',tag:'Micro'},
+        {name:'Calf Raises',detail:'25 reps every time you\'re standing still',cue:'Elevators, lines, waiting for coffee',tag:'Micro'},
+        {name:'Brisk Walk',detail:'10+ minutes — terminal, parking lot, neighborhood',cue:'Arms swinging, chin up, purposeful pace',tag:'Cardio'}
+      ],
+      gentle:[
+        {name:'Standing Stretches',detail:'5 min — neck, chest, hips',cue:'30s each hold, breathe into tight spots',tag:'Mobility'},
+        {name:'Walking',detail:'Aim for 8,000+ steps today',cue:'Take stairs, park further away, pace during calls',tag:'Cardio'},
+        {name:'Desk Push-Ups',detail:'3×10 against desk or counter',cue:'Any push is better than none',tag:'Micro'}
+      ]
+    }
+  },
+  gym:{
+    full:{
+      aggressive:[
+        {name:'Barbell Squat',detail:'4×8 — heavy, 2 min rest',cue:'Bar on traps, brace hard, depth below parallel',tag:'Legs'},
+        {name:'Bench Press',detail:'4×8 — controlled descent',cue:'Arch slightly, feet flat, bar to lower chest',tag:'Push'},
+        {name:'Bent-Over Row',detail:'4×10 — overhand grip',cue:'Hinge 45°, pull to belly button, squeeze at top',tag:'Pull'},
+        {name:'Romanian Deadlift',detail:'3×12 — feel the hamstrings',cue:'Push hips back, keep bar close to legs',tag:'Hinge'},
+        {name:'Cable Crunch',detail:'3×15',cue:'Crunch from the abs — don\'t pull with your neck',tag:'Core'}
+      ],
+      moderate:[
+        {name:'Goblet Squat',detail:'3×12 — dumbbell or kettlebell',cue:'Elbows inside knees at bottom',tag:'Legs'},
+        {name:'Dumbbell Press',detail:'3×12 — flat or incline',cue:'Lower to chest, press straight up',tag:'Push'},
+        {name:'Seated Cable Row',detail:'3×12',cue:'Sit tall, pull elbows past torso',tag:'Pull'},
+        {name:'Dumbbell RDL',detail:'3×12',cue:'Feel it in the hamstrings — don\'t round the back',tag:'Hinge'},
+        {name:'Plank',detail:'3×45s',cue:'Straight line — don\'t let hips sag or pike',tag:'Core'}
+      ],
+      gentle:[
+        {name:'Leg Press (light)',detail:'3×15 — manageable weight',cue:'Feet shoulder-width, don\'t lock knees at top',tag:'Legs'},
+        {name:'Machine Chest Press',detail:'3×15',cue:'Control the return — don\'t let the stack slam',tag:'Push'},
+        {name:'Lat Pulldown',detail:'3×15 — light to moderate',cue:'Pull to upper chest, lean back slightly',tag:'Pull'},
+        {name:'Seated Hamstring Curl',detail:'3×15',cue:'Controlled — full extension before each rep',tag:'Hinge'},
+        {name:'Machine Crunch',detail:'3×15',cue:'Exhale at the contraction, slow on the way back',tag:'Core'}
+      ]
+    },
+    chaos:{
+      aggressive:[
+        {name:'Squat + Overhead Press Superset',detail:'4×10 each — no rest between',cue:'Back squat into overhead press — one fluid move',tag:'Compound'},
+        {name:'Pull-Ups or Lat Pulldown',detail:'4×max / 4×12',cue:'Full hang at bottom, chin over bar at top',tag:'Pull'},
+        {name:'Kettlebell Swing',detail:'4×20 — power from hips',cue:'Hip hinge not squat — snap hips forward aggressively',tag:'Power'}
+      ],
+      moderate:[
+        {name:'Full Body Circuit',detail:'3 rounds: squat, press, row, hinge — 12 reps each',cue:'60s rest between rounds',tag:'Circuit'},
+        {name:'Treadmill Intervals',detail:'10 min: 1 min fast / 1 min slow',cue:'Incline 1% to simulate outdoor running',tag:'Cardio'}
+      ],
+      gentle:[
+        {name:'Light Full Body Circuit',detail:'2 rounds of machines — 15 reps each',cue:'Focus on form, not weight today',tag:'Circuit'},
+        {name:'Stationary Bike',detail:'15 min easy pace',cue:'Comfortable effort — you should be able to hold a conversation',tag:'Cardio'}
+      ]
+    }
+  },
+  home:{
+    full:{
+      aggressive:[
+        {name:'Push-Up Ladder',detail:'5 sets: 15→12→10→8→max',cue:'Vary grip each set: wide, standard, close',tag:'Push'},
+        {name:'Resistance Band Row',detail:'4×15 — anchor band at door',cue:'Pull elbows behind torso, hold 1s',tag:'Pull'},
+        {name:'Jump Squat',detail:'4×15 — explosive up, land soft',cue:'Arms swing to help — absorb landing with bent knees',tag:'Power'},
+        {name:'Single-Leg RDL',detail:'3×12 each — use band for load',cue:'Standing leg soft, hinge until back is flat',tag:'Hinge'},
+        {name:'Hollow Body Hold',detail:'3×30s',cue:'Lower back contact with floor — arms by ears',tag:'Core'}
+      ],
+      moderate:[
+        {name:'Push-Ups',detail:'3×12',cue:'Controlled — chest to floor every rep',tag:'Push'},
+        {name:'Resistance Band Row',detail:'3×12',cue:'Squeeze shoulder blades, don\'t shrug',tag:'Pull'},
+        {name:'Dumbbell Squat',detail:'3×15',cue:'Sit back, chest tall, heels on floor',tag:'Legs'},
+        {name:'Dumbbell RDL',detail:'3×12',cue:'Dumbbells close to legs the whole way',tag:'Hinge'},
+        {name:'Plank',detail:'3×40s',cue:'Squeeze everything — glutes, abs, quads',tag:'Core'}
+      ],
+      gentle:[
+        {name:'Wall Push-Ups',detail:'3×12',cue:'Full range, controlled pace',tag:'Push'},
+        {name:'Band Pull-Apart',detail:'3×15 — stretch band across chest',cue:'Arms straight, open wide, squeeze rear delts',tag:'Pull'},
+        {name:'Bodyweight Squat',detail:'3×15',cue:'Sit back, weight in heels',tag:'Legs'},
+        {name:'Glute Bridge',detail:'3×20',cue:'Drive through heels, squeeze at top',tag:'Hinge'},
+        {name:'Bird Dog',detail:'3×10 each side',cue:'Don\'t let hips rotate — stay level',tag:'Core'}
+      ]
+    },
+    chaos:{
+      aggressive:[
+        {name:'AMRAP Circuit (10 min)',detail:'Push-up → squat → row loop — max rounds',cue:'10 reps each, no rest — track your rounds',tag:'Circuit'},
+        {name:'Jump Rope or Jumping Jacks',detail:'3×90s — high intensity',cue:'Stay on the balls of your feet',tag:'Cardio'}
+      ],
+      moderate:[
+        {name:'Push-Ups',detail:'Target 50 total throughout the day',cue:'Break it up — 10 reps whenever you get a moment',tag:'Micro'},
+        {name:'Band Rows',detail:'Target 40 total throughout the day',cue:'Door anchor or pull toward any fixed point',tag:'Micro'},
+        {name:'Squats',detail:'Target 60 total throughout the day',cue:'Every time you stand up from a chair, add 5',tag:'Micro'}
+      ],
+      gentle:[
+        {name:'Morning Stretch Routine',detail:'10 min — hips, spine, shoulders',cue:'Hold each stretch 30–45s, breathe slowly',tag:'Mobility'},
+        {name:'Resistance Band Work',detail:'2×15 of any pull or push movement',cue:'Low intensity — just keep the habit alive',tag:'Light'}
+      ]
+    }
+  }
+};
+
+// ── SITUATION CARDS ───────────────────────────────────────────────────────────
+const SITUATIONS=[
+  {
+    id:'airport',context:'travel',emoji:'✈️',name:'Airport / airplane',
+    go:'Grilled chicken sandwich (no sauce), protein box (cheese, eggs, nuts), Greek yogurt parfait (skip the granola), beef jerky, hard-boiled eggs, black coffee or water',
+    skip:'Cinnamon rolls, muffins, breakfast sandwiches on croissants, smoothies with added sugar, flavored lattes, "trail mix" loaded with chocolate',
+    tip:'Walk past the first food option you see — it\'s almost always the worst one. The further into the terminal, the better the options tend to get. Starbucks protein boxes are a reliable emergency option.'
+  },
+  {
+    id:'client-dinner',context:'travel',emoji:'🍽️',name:'Client dinner (nice restaurant)',
+    go:'Steak, grilled fish, or chicken as your main. Order it simply — grilled, roasted, or broiled, not fried or in heavy sauce. Side of vegetables instead of fries. Sparkling water or one spirit + soda water.',
+    skip:'Bread basket before the meal, creamy pasta, anything described as "crispy," desserts unless you genuinely want one, multiple rounds of alcohol',
+    tip:'Order protein first, vegetables second — decide whether you actually want the starch after those arrive. Drink a full glass of water before the bread hits the table. You\'re allowed to enjoy a client dinner and still make good choices.'
+  },
+  {
+    id:'fast-food',context:'travel',emoji:'🍔',name:'Fast food / drive-through',
+    go:'Grilled chicken sandwich (no mayo, no sauce), burger patty without the bun if you\'re not hungry for carbs, side salad, grilled nuggets (not fried), black coffee or water',
+    skip:'Anything fried, combo meals with fries and soda, shakes, "crispy" anything, double-stacked burgers with special sauce',
+    tip:'Every fast food chain has a grilled protein option — it\'s just not featured on the big menu board. At McDonald\'s: McDouble no bun. At Chipotle: bowl with double meat, rice, beans, salsa, no sour cream. At Subway: any 6" with double meat, lots of vegetables.'
+  },
+  {
+    id:'hotel-breakfast',context:'travel',emoji:'🏨',name:'Hotel breakfast buffet',
+    go:'Eggs (scrambled, poached, or omelette), bacon or sausage in moderation, Greek yogurt, fresh fruit, black coffee',
+    skip:'Waffles, pancakes, pastries, sugary cereals, orange juice, flavored yogurts with fruit on the bottom',
+    tip:'Hit the eggs station first — protein anchors the meal and you\'ll naturally eat less of everything else. A two-egg omelette with vegetables + black coffee is one of the best travel breakfasts you can eat.'
+  },
+  {
+    id:'conference',context:'travel',emoji:'📋',name:'Conference / catered event',
+    go:'Whatever the protein option is — even mediocre catered chicken beats the pasta. Load up on any vegetables. Water or black coffee over juice or soda.',
+    skip:'Going back for seconds of the starch, the dessert table "just to try," juice or soda with the meal, grazing continuously during breaks',
+    tip:'Eat before a conference if you can — catered food is designed for convenience, not nutrition. If you\'re stuck with it, protein + vegetables first, then decide if you need the rest.'
+  },
+  {
+    id:'casual-restaurant',context:'travel',emoji:'🥗',name:'Casual restaurant with colleagues',
+    go:'Any protein as a main — steak, chicken, fish, burgers. Ask for the starch swapped for a double vegetable side. Salad as a starter.',
+    skip:'Sharing appetizers (adds 400–600 calories before the main), pasta dishes, anything "smothered" or "loaded," rounds of beer',
+    tip:'You can eat anywhere and make a good choice. The formula is always the same: protein + vegetables, light on the starch, watch the liquid calories. You don\'t have to explain yourself to anyone.'
+  },
+  {
+    id:'gas-station',context:'travel',emoji:'⛽',name:'Gas station / convenience store',
+    go:'Beef or turkey jerky, string cheese, hard-boiled eggs (most chains carry them now), nuts (plain, not honey-roasted), protein bars with 20g+ protein and under 10g sugar',
+    skip:'Chips, candy, "energy" bars that are just candy, hot dogs, pastries, sports drinks',
+    tip:'The best gas station strategy: jerky + string cheese + water. That\'s 25–30g of protein for under $6 and it keeps you out of the drive-through.'
+  },
+  {
+    id:'room-service',context:'travel',emoji:'🛎️',name:'Room service / eating alone in hotel',
+    go:'Grilled chicken or steak, club sandwich (remove half the bread), omelette at any hour, any protein + vegetable combination',
+    skip:'Burgers with fries as the default, pasta dishes, desserts, minibar snacks, late-night ordering when you\'re tired (not hungry)',
+    tip:'This is the easiest meal to control — nobody is watching, there\'s no social pressure, and you\'re choosing exactly what you want. Order the protein, skip the automatic fries upgrade.'
+  },
+  {
+    id:'home-cooking',context:'home',emoji:'🍳',name:'Cooking at home',
+    go:'Any lean protein as your anchor — chicken breast, ground turkey, eggs, fish, lean beef. Roasted or steamed vegetables. Rice, potatoes, or pasta in a controlled portion (quarter of the plate).',
+    skip:'Cooking with excessive oil or butter, heavy cream-based sauces, snacking while cooking, large portions of pasta or rice as the main event',
+    tip:'Cook protein in bulk once or twice a week. 2 lbs of grilled chicken or cooked ground beef in the fridge means you have 4–6 protein-anchored meals ready to go with minimal effort.'
+  },
+  {
+    id:'ordering-in',context:'home',emoji:'📱',name:'Ordering delivery / takeout',
+    go:'Bowl-style orders (grain bowls, rice bowls, burrito bowls), grilled protein options, sushi (sashimi or rolls with fish and rice), Thai with grilled protein and vegetables, Indian with chicken or lentil-based dishes',
+    skip:'Pizza as the default, creamy pasta, anything with the word "loaded," extra sides you didn\'t plan for, full-sugar drinks',
+    tip:'The best delivery order strategy: find the protein first, build around it. Most apps let you customize — double the protein, swap fries for a salad, hold the sauce. Chipotle, Sweetgreen, and most Thai places are reliable for high-protein orders.'
+  },
+  {
+    id:'grocery',context:'home',emoji:'🛒',name:'Grocery shopping',
+    go:'Chicken breast, ground turkey or lean beef, eggs, canned fish (tuna, salmon, sardines), Greek yogurt, cottage cheese, frozen vegetables, fresh vegetables, berries, rice, oats, beans',
+    skip:'Processed snack foods in bulk, sugary cereals, juice, flavored yogurts, anything with a health claim on the front of the package',
+    tip:'Shop the perimeter of the store first — that\'s where the real food lives (produce, meat, dairy). The middle aisles are where the processed food is. A simple rule: if it has more than 5 ingredients, put it back.'
+  },
+  {
+    id:'weekend-meals',context:'home',emoji:'🏠',name:'Weekend / eating at home casually',
+    go:'Eggs any style for breakfast, large salad with a protein for lunch, normal protein + vegetable dinner. Snacks: Greek yogurt, fruit, nuts in a measured portion.',
+    skip:'Grazing all day without real meals, large weekend brunches with pancakes and mimosas as the default, evening snacking in front of the TV',
+    tip:'Weekends derail most people because structure disappears. Keep breakfast and lunch protein-anchored and you can enjoy dinner without guilt. The two-meal rule: two solid meals a day is the floor, not the ceiling.'
+  }
+];
+
+// ── THIS OR THAT SWAPS ────────────────────────────────────────────────────────
+const SWAPS=[
+  {situation:'Airport hunger',bad:'Cinnamon roll + latte',good:'Protein box + black coffee',why:'Swaps ~700 empty calories for 30g protein and a clean caffeine hit'},
+  {situation:'Client dinner drink',bad:'3 beers with dinner',good:'2 sparkling water + 1 spirit neat',why:'Alcohol halts fat burning for hours — cutting two drinks saves ~300 calories and keeps your metabolism working'},
+  {situation:'Fast food stop',bad:'Combo meal (burger, fries, soda)',good:'Grilled chicken + water',why:'Same stop, same time — but 600 fewer calories and 3x the protein'},
+  {situation:'Hotel breakfast',bad:'Waffles + OJ + pastry',good:'2-egg omelette + black coffee',why:'The waffle plate can run 800+ calories before 9am. The omelette runs 250 and keeps you full longer.'},
+  {situation:'Ordering delivery',bad:'Large pizza (default choice)',good:'Burrito bowl with double protein',why:'Pizza is easy but it\'s mostly refined carbs and fat. A bowl gives you a meal that actually supports your goals.'},
+  {situation:'Afternoon snack',bad:'Chips or granola bar',good:'Greek yogurt or jerky',why:'"Healthy" granola bars are often 30g of sugar. Greek yogurt gives you 15–20g protein for the same calories.'},
+  {situation:'Home dinner (tired)',bad:'Cereal or toast because it\'s easy',good:'Scrambled eggs + any vegetable',why:'Three eggs take 4 minutes to cook. It\'s the same effort as cereal but gives you 18g protein instead of 0.'},
+  {situation:'Conference break table',bad:'Cookies and juice',good:'Nuts + water or black coffee',why:'The break table is a calorie trap disguised as hospitality. A small handful of nuts holds you until the next real meal.'},
+  {situation:'Weekend brunch',bad:'Pancakes + mimosas',good:'Eggs benedict (skip 1 half) + coffee',why:'You can still enjoy brunch — just anchor it with protein and keep the liquid calories to one drink.'},
+  {situation:'Late night craving',bad:'Chips or ice cream',good:'Cottage cheese or a protein shake',why:'Late-night snacking is usually thirst or boredom. If you\'re genuinely hungry, protein is the only thing worth eating before bed.'}
+];
+
+// ── NUTRITION ENGINE ──────────────────────────────────────────────────────────
+function getNutrition(profile){
+  const cw=profile.currentWeight||180,goal=profile.goal;
+  let protein,calories;
+  if(goal==='lose'){protein=Math.round(cw*.8);calories=Math.round(cw*10);}
+  else if(goal==='build'){protein=Math.round(cw*.9);calories=Math.round(cw*16);}
+  else{protein=Math.round(cw*.75);calories=Math.round(cw*13);}
+  const green={lose:'Grilled chicken, lean beef, fish, eggs, Greek yogurt, cottage cheese, protein shakes, all vegetables, legumes — eat these freely at every meal',build:'Chicken, beef, eggs, dairy, fish, rice, oats, potatoes, fruit, legumes — these are your building blocks. Don\'t shortchange calories.',maintain:'Lean proteins, vegetables, fruit, whole grains, legumes — the foundation of most meals'};
+  const amber={lose:'Rice, pasta, bread, potatoes, cheese, olive oil, nuts — good foods in controlled portions (¼ plate max)',build:'Whole fat dairy, nut butters, avocado, higher-calorie whole foods — use these intentionally to hit your surplus',maintain:'Moderate carbs, healthy fats, dairy — fine in normal portions'};
+  const red={lose:'Liquid calories (alcohol, soda, sugary coffee), fried foods, processed snacks, bars with hidden sugar — these quietly erase your deficit',build:'Ultra-processed junk, excessive alcohol, empty calories with no nutritional value',maintain:'Daily alcohol, highly processed foods, skipping meals that lead to overeating later'};
+  return{protein,calories,green:green[goal]||green.lose,amber:amber[goal]||amber.lose,red:red[goal]||red.lose};
+}
+
+// ── WEEK MODAL ────────────────────────────────────────────────────────────────
+const WEEK_QUESTIONS=[
+  {key:'env',question:'What\'s your environment this week?',options:[{val:'bodyweight',label:'Bodyweight only',desc:'Hotel, small space, no equipment'},{val:'gym',label:'Gym access',desc:'Weights and machines available'},{val:'home',label:'Home setup',desc:'Bands, dumbbells, or pull-up bar'}]},
+  {key:'schedule',question:'How\'s your schedule this week?',options:[{val:'consistent',label:'Consistent windows',desc:'I can find 20–30 min most days'},{val:'chaos',label:'Chaos mode',desc:'Packed — need micro-workouts'}]},
+  {key:'intensity',question:'What\'s your mode this week?',options:[{val:'aggressive',label:'Burn mode',desc:'Push hard, aggressive deficit'},{val:'moderate',label:'Steady mode',desc:'Sustainable — consistent effort'},{val:'gentle',label:'Recovery mode',desc:'Stress week — move and maintain'}]}
+];
+let wkStep=0,wkData={};
+
+function openWeekModal(){
+  wkStep=0;wkData={};
+  if(S.weekSetup){wkData.env=S.weekSetup.env;wkData.schedule=S.weekSetup.schedule;wkData.intensity=S.weekSetup.intensity;}
+  renderWeekModal();document.getElementById('week-modal').classList.remove('hidden');
+}
+function renderWeekModal(){
+  const q=WEEK_QUESTIONS[wkStep],isLast=wkStep===WEEK_QUESTIONS.length-1;
+  const opts=q.options.map((o,i)=>`<div class="opt ${wkData[q.key]===o.val?'sel':''}" onclick="wkSel('${q.key}','${o.val}',this)"><div class="opt-title">${o.label}</div><div class="opt-desc">${o.desc}</div></div>`).join('');
+  document.getElementById('week-modal').innerHTML=`<div class="modal"><div class="modal-handle"></div><div class="sec-label">${wkStep+1} of ${WEEK_QUESTIONS.length}</div><div style="font-size:20px;font-weight:700;margin:6px 0 16px;">${q.question}</div><div class="opt-grid">${opts}</div><button class="ob-btn" id="wk-btn" onclick="${isLast?'saveWeek()':'wkNext()'}" ${wkData[q.key]?'':'disabled'}>${isLast?'Start my week →':'Next →'}</button><button class="btn-ghost" onclick="closeWeekModal()">Cancel</button></div>`;
+}
+function wkSel(key,val,el){
+  wkData[key]=val;
+  el.parentNode.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const btn=document.getElementById('wk-btn');if(btn) btn.disabled=false;
+}
+function wkNext(){wkStep++;renderWeekModal();}
+function saveWeek(){
+  S.weekSetup={env:wkData.env,schedule:wkData.schedule,intensity:wkData.intensity,weekStart:weekStart()};
+  saveS();closeWeekModal();toast('Week configured ✓');renderTab();
+}
+function closeWeekModal(){document.getElementById('week-modal').classList.add('hidden');}
+
+// ── APP RENDERING ─────────────────────────────────────────────────────────────
+function showTab(tab){
+  currentTab=tab;
+  ['today','nutrition','progress','settings'].forEach(t=>document.getElementById('nav-'+t).classList.toggle('active',t===tab));
+  renderTab();window.scrollTo(0,0);
+}
+
+function renderTab(){
+  const p=S.profile,ws=S.weekSetup,today=todayKey(),checks=(S.checkboxes||{})[today]||[];
+  const greeting=()=>{const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening';};
+  let html=`<div class="app-header"><div><div class="app-name">${greeting()}, ${p.name}</div><div class="app-sub">${ws?ws.intensity+' · '+(ws.schedule==='chaos'?'Chaos week':'Full protocol'):'No week setup yet'}</div></div><div class="avatar">${p.goal==='lose'?'🎯':p.goal==='build'?'💪':'⚡'}</div></div>`;
+
+  if(currentTab==='today'){
+    if(!ws){
+      html+=`<div style="background:var(--white);border:1px solid var(--gray-border);border-radius:var(--r);padding:24px;text-align:center;margin-bottom:16px;"><div style="font-size:36px;margin-bottom:12px;">📅</div><div style="font-size:17px;font-weight:700;margin-bottom:6px;">Set up your week</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">Tell me about your environment and schedule this week — takes 60 seconds.</div><button class="ob-btn" onclick="openWeekModal()">Configure this week →</button></div>`;
+    } else {
+      const isChaos=ws.schedule==='chaos';
+      const workout=getWorkout();
+      const done=checks.length,total=workout.length;
+      const bannerClass=isChaos?'b-chaos':ws.env==='gym'?'b-gym':'b-full';
+      html+=`<div class="week-banner ${bannerClass}"><div class="banner-mode">${isChaos?'Chaos mode':ws.env==='gym'?'Gym protocol':'Bodyweight protocol'}</div><div class="banner-title">${isChaos?'⚡ Micro-workout day':'💪 Full session today'}</div><div class="banner-desc">${isChaos?'Hit 100 total reps throughout the day in small doses':'Complete all exercises · mark each one done'}</div></div>`;
+      const nut=getNutrition(p);
+      html+=`<div class="stats-row"><div class="stat"><div class="stat-val">${done}/${total}</div><div class="stat-label">Done today</div></div><div class="stat"><div class="stat-val">${nut.protein}g</div><div class="stat-label">Protein target</div></div></div>`;
+      html+=`<div class="sec-label">Today's exercises</div><div class="ex-list">`;
+      workout.forEach((ex,i)=>{
+        const isDone=checks.includes(i);
+        html+=`<div class="ex-card ${isDone?'done':''}" onclick="toggleEx(${i})"><div class="ex-check"><div class="check-mark"></div></div><div style="flex:1;"><div class="ex-name">${ex.name}</div><div class="ex-detail">${ex.detail}</div><div class="ex-cue">💡 ${ex.cue}</div><span class="ex-tag">${ex.tag}</span></div></div>`;
+      });
+      html+=`</div>`;
+      if(done===total&&total>0) html+=`<div class="success-box"><div style="font-size:28px;margin-bottom:8px;">🎉</div><div style="font-weight:700;color:var(--green);font-size:16px;">All done for today!</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Log your weight in Progress to track the trend.</div></div>`;
+      html+=`<button class="btn-ghost" onclick="openWeekModal()">↺ Update week setup</button>`;
+    }
+  }
+
+  else if(currentTab==='nutrition'){
+    const nut=getNutrition(p);
+    const lifestyle=p.lifestyle||'mixed';
+    const isTravel=lifestyle==='travel';
+    const isHome=lifestyle==='home';
+
+    // Targets
+    html+=`<div class="nut-targets"><div class="nut-target-item"><div class="nut-target-val">${nut.protein}g</div><div class="nut-target-label">Protein / day</div></div><div class="nut-divider"></div><div class="nut-target-item"><div class="nut-target-val">${nut.calories}</div><div class="nut-target-label">Calories / day</div></div></div>`;
+
+    // Situation cards
+    const travelSits=SITUATIONS.filter(s=>s.context==='travel');
+    const homeSits=SITUATIONS.filter(s=>s.context==='home');
+    let primarySits,secondarySits,primaryLabel,secondaryLabel;
+    if(isHome){
+      primarySits=homeSits;secondarySits=travelSits;
+      primaryLabel='Home situations';secondaryLabel='+ Show travel situations';
+    } else if(isTravel){
+      primarySits=travelSits;secondarySits=homeSits;
+      primaryLabel='Travel situations';secondaryLabel='+ Show home situations';
+    } else {
+      primarySits=[...travelSits,...homeSits];secondarySits=[];
+      primaryLabel='All situations';secondaryLabel='';
+    }
+
+    html+=`<div class="toggle-row"><div class="toggle-label">Situation guide</div>${secondarySits.length>0?`<button class="toggle-btn ${nutExpanded?'expanded':''}" id="expand-btn" onclick="toggleNutExpand()">${nutExpanded?'Show less':'Show all'}</button>`:''}</div>`;
+    html+=`<div class="sit-grid">`;
+    primarySits.forEach(s=>{
+      html+=renderSitCard(s,false);
+    });
+    secondarySits.forEach(s=>{
+      html+=renderSitCard(s,!nutExpanded);
+    });
+    html+=`</div>`;
+
+    // This or That
+    html+=`<div class="sec-label">This or that — smart swaps</div><div class="swaps-list">`;
+    SWAPS.forEach(sw=>{
+      html+=`<div class="swap-card"><div class="swap-situation">${sw.situation}</div><div class="swap-row"><div class="swap-bad"><div class="swap-bad-label">❌ Skip</div><div class="swap-item">${sw.bad}</div></div><div class="swap-arrow">→</div><div class="swap-good"><div class="swap-good-label">✓ Choose</div><div class="swap-item">${sw.good}</div></div></div><div class="swap-why">${sw.why}</div></div>`;
+    });
+    html+=`</div>`;
+
+    // Traffic light
+    html+=`<div class="sec-label">Traffic light reference</div><div class="tl-list"><div class="tl g"><div class="tl-head">🟢 Green — eat freely</div><div class="tl-body">${nut.green}</div></div><div class="tl a"><div class="tl-head">🟡 Amber — eat mindfully</div><div class="tl-body">${nut.amber}</div></div><div class="tl r"><div class="tl-head">🔴 Red — minimize</div><div class="tl-body">${nut.red}</div></div></div>`;
+
+    if(p.goal==='lose'){
+      html+=`<div class="sec-label">Plate method</div><div class="plate-row"><div class="plate-seg veg"><div class="plate-frac">½</div><div class="plate-name">Vegetables</div></div><div class="plate-seg pro"><div class="plate-frac">¼</div><div class="plate-name">Protein</div></div><div class="plate-seg carb"><div class="plate-frac">¼</div><div class="plate-name">Carbs</div></div></div>`;
+    }
+  }
+
+  else if(currentTab==='progress'){
+    const weights=S.weights||[],cw=p.currentWeight,gw=p.goalWeight;
+    const latest=weights.length>0?weights[weights.length-1].w:cw;
+    const lost=(cw-latest).toFixed(1),toGo=Math.max(0,(latest-gw)).toFixed(1);
+    const pct=cw>gw?Math.min(100,Math.round(((cw-latest)/(cw-gw))*100)):0;
+    html+=`<div class="stats-row"><div class="stat"><div class="stat-val">${lost>0?lost:'—'}</div><div class="stat-label">${p.goal==='build'?'Lbs gained':'Lbs lost'}</div></div><div class="stat"><div class="stat-val">${toGo>0?toGo:'🎯'}</div><div class="stat-label">To goal</div></div></div>`;
+    if(cw!==gw) html+=`<div class="card" style="margin-bottom:14px;"><div class="card-title">Progress to goal</div><div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div><div class="progress-label"><span>${latest} lbs</span><span>Goal: ${gw} lbs</span></div></div>`;
+    html+=`<div class="weight-card"><div class="card-title">Log today's weight</div><div class="card-sub">Same time each day gives the cleanest trend</div><div class="wt-input-row"><input type="number" id="wt-in" placeholder="e.g. 210.5" step="0.1" min="80" max="500" /><button class="log-btn" onclick="logWeight()">Log</button></div></div>`;
+    if(weights.length===0){
+      html+=`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No entries yet</div><div class="empty-desc">Log your first weight above. Weekly check-ins give a cleaner trend than daily — fluctuations of 1–3 lbs day-to-day are completely normal.</div></div>`;
+    } else {
+      html+=`<div class="sec-label">Weight log</div><div class="weight-card">`;
+      const sorted=[...weights].reverse();
+      sorted.forEach((e,i)=>{
+        const prev=sorted[i+1];
+        let dHtml='';
+        if(prev){const diff=(e.w-prev.w).toFixed(1),cls=diff<0?'dn':diff>0?'up':'eq',sign=diff>0?'+':'';dHtml=`<span class="wt-delta ${cls}">${sign}${diff}</span>`;}
+        html+=`<div class="wt-entry"><span style="color:var(--text-muted);font-size:13px;">${fmtDate(e.d)}</span><div style="display:flex;align-items:center;gap:8px;">${dHtml}<span style="font-weight:700;">${e.w} lbs</span></div></div>`;
+      });
+      html+=`</div>`;
+    }
+  }
+
+  else if(currentTab==='settings'){
+    html+=`<div class="card" style="margin-bottom:14px;"><div class="card-title">Your profile</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;font-size:14px;">`;
+    const rows=[['Name',p.name],['Starting weight',p.currentWeight+' lbs'],['Goal weight',p.goalWeight+' lbs'],['Goal',p.goal==='lose'?'Weight loss':p.goal==='build'?'Build muscle':'Maintain'],['Lifestyle',p.lifestyle],['Default environment',p.defaultEnv]];
+    rows.forEach(r=>html+=`<div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">${r[0]}</span><span style="font-weight:600;">${r[1]}</span></div>`);
+    html+=`</div></div><button class="ob-btn" style="margin-bottom:10px;" onclick="rerunOB()">✏️ Edit my profile</button><button class="btn-ghost" onclick="clearData()">🗑 Clear all data</button>`;
+  }
+
+  document.getElementById('app-content').innerHTML=html;
+}
+
+function renderSitCard(s,hidden){
+  return `<div class="sit-card ${hidden?'hidden':''}" id="sit-${s.id}">
+    <div class="sit-header" onclick="toggleSit('${s.id}')">
+      <span class="sit-emoji">${s.emoji}</span>
+      <span class="sit-name">${s.name}</span>
+      <span class="sit-context ${s.context}">${s.context}</span>
+      <span class="sit-arrow">›</span>
+    </div>
+    <div class="sit-body">
+      <div class="sit-section"><div class="sit-section-label go">✓ Order / eat this</div><div class="sit-items">${s.go}</div></div>
+      <div class="sit-section"><div class="sit-section-label skip">✗ Avoid this</div><div class="sit-items">${s.skip}</div></div>
+      <div class="sit-tip">💡 ${s.tip}</div>
+    </div>
+  </div>`;
+}
+
+function toggleSit(id){
+  const card=document.getElementById('sit-'+id);
+  if(card) card.classList.toggle('open');
+}
+
+function toggleNutExpand(){
+  nutExpanded=!nutExpanded;
+  renderTab();
+  setTimeout(()=>{
+    const btn=document.getElementById('expand-btn');
+    if(btn) btn.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },50);
+}
+
+function getWorkout(){
+  const ws=S.weekSetup;if(!ws) return [];
+  const env=ws.env||S.profile.defaultEnv||'bodyweight';
+  const schedKey=ws.schedule==='chaos'?'chaos':'full';
+  const intKey=ws.intensity||'moderate';
+  return WORKOUTS[env]?.[schedKey]?.[intKey]||WORKOUTS.bodyweight.full.moderate;
+}
+
+function toggleEx(idx){
+  const today=todayKey();
+  if(!S.checkboxes) S.checkboxes={};
+  if(!S.checkboxes[today]) S.checkboxes[today]=[];
+  const arr=S.checkboxes[today],pos=arr.indexOf(idx);
+  if(pos===-1){arr.push(idx);toast('✓ Nice work!');}
+  else arr.splice(pos,1);
+  saveS();renderTab();
+}
+
+function logWeight(){
+  const val=parseFloat(document.getElementById('wt-in').value);
+  if(!val||val<50||val>600){toast('Enter a valid weight');return;}
+  if(!S.weights) S.weights=[];
+  const today=todayKey();
+  S.weights=S.weights.filter(e=>e.d!==today);
+  S.weights.push({d:today,w:val});
+  S.weights.sort((a,b)=>a.d.localeCompare(b.d));
+  saveS();toast('Weight logged ✓');renderTab();
+}
+
+function rerunOB(){
+  if(!confirm('Edit your profile? Your weight log and exercise history will be kept.')) return;
+  obStep=0;obData={name:S.profile.name,currentWeight:String(S.profile.currentWeight),goalWeight:String(S.profile.goalWeight),goal:S.profile.goal,defaultEnv:S.profile.defaultEnv,defaultSchedule:S.profile.defaultSchedule,defaultIntensity:S.profile.defaultIntensity,lifestyle:S.profile.lifestyle};
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-ob').classList.add('active');
+  renderOB();window.scrollTo(0,0);
+}
+
+function clearData(){
+  if(!confirm('Delete everything — profile, weight log, and all history?')) return;
+  localStorage.removeItem('bp_v3');S={};location.reload();
+}
+
+function launchApp(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-app').classList.add('active');
+  currentTab='today';
+  ['today','nutrition','progress','settings'].forEach(t=>document.getElementById('nav-'+t).classList.toggle('active',t==='today'));
+  renderTab();window.scrollTo(0,0);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+loadS();
+if(S.profile){launchApp();}
+else{obStep=0;obData={};renderOB();}
+</script>
+</body>
+</html>
